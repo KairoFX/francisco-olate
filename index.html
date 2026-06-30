@@ -374,7 +374,7 @@
                             </div>
                         </div>
 
-                        <form id="contactForm" action="https://formspree.io/f/xrewaelr" method="POST" novalidate>
+                        <form id="contactForm" action="https://formspree.io/f/xeqwabcd" method="POST" novalidate>
                             <div class="row g-3">
 
                                 <div class="col-12 col-sm-6">
@@ -496,6 +496,39 @@
 
     <button class="back-to-top" id="backToTop" aria-label="Volver arriba">↑</button>
 
+    <div class="melt-player" id="meltPlayer">
+        <svg class="melt-drip" viewBox="0 0 240 90" preserveAspectRatio="none" aria-hidden="true">
+            <path id="meltPath"
+                d="M0,0 L240,0 L240,20 Q200,20 195,55 Q190,85 178,85 Q166,85 164,55 Q162,30 150,30 Q138,30 136,55 Q134,90 120,90 Q106,90 104,55 Q102,30 90,30 Q78,30 76,55 Q74,85 62,85 Q50,85 45,55 Q40,20 0,20 Z"
+                fill="#1c1f26"></path>
+        </svg>
+
+        <div class="melt-body">
+            <div class="melt-screen">
+                <span class="melt-disc">🎵</span>
+            </div>
+            <div class="melt-title">Francisco · Hablemos</div>
+
+            <div class="melt-progress">
+                <div class="melt-progress-fill" id="meltProgressFill"></div>
+            </div>
+            <div class="melt-times">
+                <span id="meltCurrent">0:00</span>
+                <span id="meltDuration">--:--</span>
+            </div>
+
+            <div class="melt-controls">
+                <button class="melt-btn" id="meltPrev" aria-label="Anterior">⏮</button>
+                <button class="melt-btn melt-btn-main" id="meltPlay" aria-label="Reproducir">▶</button>
+                <button class="melt-btn" id="meltNext" aria-label="Siguiente">⏭</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="musicPlayer" style="position:absolute; width:0; height:0; overflow:hidden;"></div>
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
@@ -603,6 +636,89 @@
                 }, 4000);
             }
         });
+
+        const YOUTUBE_PLAYLIST = ['https://youtu.be/nmm5kEZkS8Q?si=03s0M6tpDNrPMSWr', 'https://youtu.be/lZp96uELegI?si=VZzK6AvLjseZ4Axj', 'https://youtu.be/3AtDnEC4zak?si=i_wa63hncchTZhVT']; let currentTrack = 0;
+
+        let ytPlayer;
+        let musicReady = false;
+        let isPlaying = false;
+
+        const meltPlayBtn = document.getElementById('meltPlay');
+        const meltPrevBtn = document.getElementById('meltPrev');
+        const meltNextBtn = document.getElementById('meltNext');
+        const meltProgressFill = document.getElementById('meltProgressFill');
+        const meltCurrent = document.getElementById('meltCurrent');
+        const meltDuration = document.getElementById('meltDuration');
+        const meltPlayerEl = document.getElementById('meltPlayer');
+
+        function formatTime(sec) {
+            if (!sec || isNaN(sec)) return '0:00';
+            const m = Math.floor(sec / 60);
+            const s = Math.floor(sec % 60).toString().padStart(2, '0');
+            return m + ':' + s;
+        }
+
+        function onYouTubeIframeAPIReady() {
+            ytPlayer = new YT.Player('musicPlayer', {
+                height: '1',
+                width: '1',
+                videoId: YOUTUBE_PLAYLIST[currentTrack],
+                playerVars: { autoplay: 0, controls: 0 },
+                events: {
+                    onReady: () => { musicReady = true; },
+                    onStateChange: onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.PLAYING) {
+                isPlaying = true;
+                meltPlayBtn.textContent = '⏸';
+                meltPlayerEl.classList.add('playing');
+                meltDuration.textContent = formatTime(ytPlayer.getDuration());
+                tickProgress();
+            } else if (event.data === YT.PlayerState.PAUSED) {
+                isPlaying = false;
+                meltPlayBtn.textContent = '▶';
+                meltPlayerEl.classList.remove('playing');
+            } else if (event.data === YT.PlayerState.ENDED) {
+                nextTrack();
+            }
+        }
+
+        function tickProgress() {
+            if (!isPlaying || !ytPlayer || !ytPlayer.getCurrentTime) return;
+            const cur = ytPlayer.getCurrentTime();
+            const dur = ytPlayer.getDuration();
+            if (dur > 0) {
+                meltProgressFill.style.width = (cur / dur * 100) + '%';
+                meltCurrent.textContent = formatTime(cur);
+            }
+            requestAnimationFrame(tickProgress);
+        }
+
+        function loadTrack(index) {
+            currentTrack = (index + YOUTUBE_PLAYLIST.length) % YOUTUBE_PLAYLIST.length;
+            if (musicReady) {
+                ytPlayer.loadVideoById(YOUTUBE_PLAYLIST[currentTrack]);
+            }
+        }
+
+        function nextTrack() { loadTrack(currentTrack + 1); }
+        function prevTrack() { loadTrack(currentTrack - 1); }
+
+        meltPlayBtn.addEventListener('click', () => {
+            if (!musicReady) return;
+            if (isPlaying) {
+                ytPlayer.pauseVideo();
+            } else {
+                ytPlayer.playVideo();
+            }
+        });
+
+        meltNextBtn.addEventListener('click', nextTrack);
+        meltPrevBtn.addEventListener('click', prevTrack);
     </script>
 
 </body>
