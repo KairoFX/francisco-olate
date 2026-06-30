@@ -496,36 +496,57 @@
 
     <button class="back-to-top" id="backToTop" aria-label="Volver arriba">↑</button>
 
-    <div class="melt-player" id="meltPlayer">
-        <svg class="melt-drip" viewBox="0 0 168 40" aria-hidden="true">
-            <path id="meltPath" d="M0,0 L168,0 L168,12 Q150,12 147,26 Q144,38 136,38 Q128,38 126,26 Q124,16 112,16 Q100,16 98,26 Q96,40 84,40 Q72,40 70,26 Q68,16 56,16 Q44,16 42,26 Q40,38 32,38 Q24,38 21,26 Q18,12 0,12 Z" fill="#1c1f26"></path>
-        </svg>
+    <div class="music-bubble-wrap" id="musicBubbleWrap">
 
-        <div class="melt-body">
-            <div class="melt-screen">
-                <span class="melt-disc">🎵</span>
-            </div>
-            <div class="melt-title">Francisco · Hablemos</div>
+        <button class="music-bubble" id="musicBubble" aria-label="Abrir reproductor de música">
+            <svg class="bubble-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 13.5V11a8 8 0 0 1 16 0v2.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <rect x="2.5" y="12.5" width="3.2" height="6" rx="1.4" fill="currentColor"/>
+                <rect x="18.3" y="12.5" width="3.2" height="6" rx="1.4" fill="currentColor"/>
+                <g class="bubble-wave">
+                    <rect x="8.4" y="14.7" width="1.2" height="1.6" rx="0.6" fill="currentColor"/>
+                    <rect x="10.3" y="12.6" width="1.2" height="5.8" rx="0.6" fill="currentColor"/>
+                    <rect x="12.2" y="9.4" width="1.2" height="12.2" rx="0.6" fill="currentColor"/>
+                    <rect x="14.1" y="12.6" width="1.2" height="5.8" rx="0.6" fill="currentColor"/>
+                    <rect x="16" y="14.7" width="1.2" height="1.6" rx="0.6" fill="currentColor"/>
+                </g>
+            </svg>
+            <span class="bubble-ring"></span>
+        </button>
 
-            <div class="melt-progress">
-                <div class="melt-progress-fill" id="meltProgressFill"></div>
+        <div class="music-panel" id="musicPanel">
+            <div class="music-panel-header">
+                <span class="music-panel-disc">🎵</span>
+                <div>
+                    <div class="music-panel-title">Francisco · Hablemos</div>
+                    <div class="music-panel-sub" id="meltTrackName">Música de fondo</div>
+                </div>
+                <button class="music-panel-close" id="musicPanelClose" aria-label="Cerrar">✕</button>
             </div>
-            <div class="melt-times">
+
+            <div class="music-progress">
+                <div class="music-progress-fill" id="meltProgressFill"></div>
+            </div>
+            <div class="music-times">
                 <span id="meltCurrent">0:00</span>
                 <span id="meltDuration">--:--</span>
             </div>
 
-            <div class="melt-controls">
-                <button class="melt-btn" id="meltPrev" aria-label="Anterior">⏮</button>
-                <button class="melt-btn melt-btn-main" id="meltPlay" aria-label="Reproducir">▶</button>
-                <button class="melt-btn" id="meltNext" aria-label="Siguiente">⏭</button>
+            <div class="music-controls">
+                <button class="music-btn" id="meltPrev" aria-label="Anterior">⏮</button>
+                <button class="music-btn music-btn-main" id="meltPlay" aria-label="Reproducir">▶</button>
+                <button class="music-btn" id="meltNext" aria-label="Siguiente">⏭</button>
+            </div>
+
+            <div class="music-volume">
+                <span class="volume-icon" id="volumeIcon">🔊</span>
+                <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="70" aria-label="Volumen" />
             </div>
         </div>
+
     </div>
 
-    <div id="musicPlayer" style="position:absolute; width:0; height:0; overflow:hidden;"></div>
-
-    <script src="https://www.youtube.com/iframe_api"></script>
+    <audio id="musicPlayer" preload="metadata"></audio>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
@@ -635,12 +656,18 @@
             }
         });
 
-        const YOUTUBE_PLAYLIST = ['nmm5kEZkS8Q', 'lZp96uELegI', '3AtDnEC4zak'];
+        // 🎵 PLAYLIST LOCAL — archivos dentro de la carpeta "music"
+        const PLAYLIST = [
+            { src: 'music/(+Musica - 1).mp3', title: 'Música 1' },
+            { src: 'music/(+Musica - 2).mp3', title: 'Música 2' },
+            { src: 'music/(+Musica - 3).mp3', title: 'Música 3' },
+            { src: 'music/(+Musica - 4).mp3', title: 'Música 4' },
+            { src: 'music/(+Musica - 5).mp3', title: 'Música 5' }
+        ];
         let currentTrack = 0;
-
-        let ytPlayer;
-        let musicReady = false;
         let isPlaying = false;
+        const audioPlayer = document.getElementById('musicPlayer');
+        const meltTrackName = document.getElementById('meltTrackName');
 
         const meltPlayBtn = document.getElementById('meltPlay');
         const meltPrevBtn = document.getElementById('meltPrev');
@@ -648,7 +675,25 @@
         const meltProgressFill = document.getElementById('meltProgressFill');
         const meltCurrent = document.getElementById('meltCurrent');
         const meltDuration = document.getElementById('meltDuration');
-        const meltPlayerEl = document.getElementById('meltPlayer');
+        const meltPlayerEl = document.getElementById('musicBubbleWrap');
+
+        const musicBubble = document.getElementById('musicBubble');
+        const musicPanel = document.getElementById('musicPanel');
+        const musicPanelClose = document.getElementById('musicPanelClose');
+
+        musicBubble.addEventListener('click', () => {
+            musicPanel.classList.toggle('open');
+        });
+
+        musicPanelClose.addEventListener('click', () => {
+            musicPanel.classList.remove('open');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!meltPlayerEl.contains(e.target)) {
+                musicPanel.classList.remove('open');
+            }
+        });
 
         function formatTime(sec) {
             if (!sec || isNaN(sec)) return '0:00';
@@ -657,67 +702,81 @@
             return m + ':' + s;
         }
 
-        function onYouTubeIframeAPIReady() {
-            ytPlayer = new YT.Player('musicPlayer', {
-                height: '1',
-                width: '1',
-                videoId: YOUTUBE_PLAYLIST[currentTrack],
-                playerVars: { autoplay: 0, controls: 0 },
-                events: {
-                    onReady: () => { musicReady = true; },
-                    onStateChange: onPlayerStateChange
-                }
-            });
+        const volumeSlider = document.getElementById('volumeSlider');
+        const volumeIcon = document.getElementById('volumeIcon');
+        audioPlayer.volume = volumeSlider.value / 100;
+
+        function loadTrackData(index, autoplay) {
+            currentTrack = (index + PLAYLIST.length) % PLAYLIST.length;
+            audioPlayer.src = PLAYLIST[currentTrack].src;
+            meltTrackName.textContent = PLAYLIST[currentTrack].title;
+            meltCurrent.textContent = '0:00';
+            meltDuration.textContent = '--:--';
+            meltProgressFill.style.width = '0%';
+            if (autoplay) audioPlayer.play();
         }
 
-        function onPlayerStateChange(event) {
-            if (event.data === YT.PlayerState.PLAYING) {
-                isPlaying = true;
-                meltPlayBtn.textContent = '⏸';
-                meltPlayerEl.classList.add('playing');
-                meltDuration.textContent = formatTime(ytPlayer.getDuration());
-                tickProgress();
-            } else if (event.data === YT.PlayerState.PAUSED) {
-                isPlaying = false;
-                meltPlayBtn.textContent = '▶';
-                meltPlayerEl.classList.remove('playing');
-            } else if (event.data === YT.PlayerState.ENDED) {
-                nextTrack();
-            }
-        }
-
-        function tickProgress() {
-            if (!isPlaying || !ytPlayer || !ytPlayer.getCurrentTime) return;
-            const cur = ytPlayer.getCurrentTime();
-            const dur = ytPlayer.getDuration();
-            if (dur > 0) {
-                meltProgressFill.style.width = (cur / dur * 100) + '%';
-                meltCurrent.textContent = formatTime(cur);
-            }
-            requestAnimationFrame(tickProgress);
-        }
-
-        function loadTrack(index) {
-            currentTrack = (index + YOUTUBE_PLAYLIST.length) % YOUTUBE_PLAYLIST.length;
-            if (musicReady) {
-                ytPlayer.loadVideoById(YOUTUBE_PLAYLIST[currentTrack]);
-            }
-        }
-
-        function nextTrack() { loadTrack(currentTrack + 1); }
-        function prevTrack() { loadTrack(currentTrack - 1); }
+        function nextTrack() { loadTrackData(currentTrack + 1, isPlaying); }
+        function prevTrack() { loadTrackData(currentTrack - 1, isPlaying); }
 
         meltPlayBtn.addEventListener('click', () => {
-            if (!musicReady) return;
+            if (!audioPlayer.src) loadTrackData(0, false);
             if (isPlaying) {
-                ytPlayer.pauseVideo();
+                audioPlayer.pause();
             } else {
-                ytPlayer.playVideo();
+                audioPlayer.play();
             }
         });
 
+        audioPlayer.addEventListener('play', () => {
+            isPlaying = true;
+            meltPlayBtn.textContent = '⏸';
+            meltPlayerEl.classList.add('playing');
+        });
+
+        audioPlayer.addEventListener('pause', () => {
+            isPlaying = false;
+            meltPlayBtn.textContent = '▶';
+            meltPlayerEl.classList.remove('playing');
+        });
+
+        audioPlayer.addEventListener('loadedmetadata', () => {
+            meltDuration.textContent = formatTime(audioPlayer.duration);
+        });
+
+        audioPlayer.addEventListener('timeupdate', () => {
+            if (audioPlayer.duration > 0) {
+                meltProgressFill.style.width = (audioPlayer.currentTime / audioPlayer.duration * 100) + '%';
+                meltCurrent.textContent = formatTime(audioPlayer.currentTime);
+            }
+        });
+
+        audioPlayer.addEventListener('ended', nextTrack);
+
         meltNextBtn.addEventListener('click', nextTrack);
         meltPrevBtn.addEventListener('click', prevTrack);
+
+        function updateVolumeIcon(val) {
+            if (val == 0) volumeIcon.textContent = '🔇';
+            else if (val < 50) volumeIcon.textContent = '🔉';
+            else volumeIcon.textContent = '🔊';
+        }
+
+        volumeSlider.addEventListener('input', () => {
+            const val = volumeSlider.value;
+            updateVolumeIcon(val);
+            audioPlayer.volume = val / 100;
+        });
+
+        volumeIcon.addEventListener('click', () => {
+            if (volumeSlider.value > 0) {
+                volumeSlider.dataset.prev = volumeSlider.value;
+                volumeSlider.value = 0;
+            } else {
+                volumeSlider.value = volumeSlider.dataset.prev || 70;
+            }
+            volumeSlider.dispatchEvent(new Event('input'));
+        });
     </script>
 
 </body>
