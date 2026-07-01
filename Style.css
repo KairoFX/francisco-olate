@@ -1277,6 +1277,16 @@ strong { color: var(--text); font-weight: 600; }
   transform: scale(1.1);
 }
 
+.music-btn-repeat {
+  font-size: .8rem;
+  opacity: .55;
+}
+
+.music-btn-repeat.active {
+  opacity: 1;
+  color: var(--blue);
+}
+
 @keyframes wave-bounce {
   0%, 100% { transform: scaleY(0.4); }
   50%      { transform: scaleY(1); }
