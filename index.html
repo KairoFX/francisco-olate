@@ -468,6 +468,10 @@
                     <a href="#" class="social-pill" target="_blank" rel="noopener">
                         🐙 GitHub
                     </a>
+                    <a href="https://wa.me/56XXXXXXXXX" class="social-pill social-pill-green" target="_blank"
+                        rel="noopener">
+                        💬 WhatsApp
+                    </a>
                 </div>
             </div>
 
@@ -532,6 +536,7 @@
                 <button class="music-btn" id="meltPrev" aria-label="Anterior">⏮</button>
                 <button class="music-btn music-btn-main" id="meltPlay" aria-label="Reproducir">▶</button>
                 <button class="music-btn" id="meltNext" aria-label="Siguiente">⏭</button>
+                <button class="music-btn music-btn-repeat" id="meltRepeat" aria-label="Repetir">🔁</button>
             </div>
 
             <div class="music-volume">
@@ -654,14 +659,16 @@
 
         // 🎵 PLAYLIST LOCAL — archivos dentro de la carpeta "music"
         const PLAYLIST = [
-            { src: 'music/(+Musica - 1).mp3', title: 'Música 1' },
-            { src: 'music/(+Musica - 2).mp3', title: 'Música 2' },
-            { src: 'music/(+Musica - 3).mp3', title: 'Música 3' },
-            { src: 'music/(+Musica - 4).mp3', title: 'Música 4' },
-            { src: 'music/(+Musica - 5).mp3', title: 'Música 5' }
+            { src: 'music/Musica_-_1.mp3', title: 'Música 1' },
+            { src: 'music/Musica_-_2.mp3', title: 'Música 2' },
+            { src: 'music/Musica_-_3.mp3', title: 'Música 3' },
+            { src: 'music/Musica_-_4.mp3', title: 'Música 4' },
+            { src: 'music/Musica_-_5.mp3', title: 'Música 5' }
         ];
         let currentTrack = 0;
         let isPlaying = false;
+        // repeatMode: 'all' = repite toda la playlist en bucle, 'one' = repite la canción actual en bucle
+        let repeatMode = 'all';
         const audioPlayer = document.getElementById('musicPlayer');
         const meltTrackName = document.getElementById('meltTrackName');
 
@@ -747,10 +754,38 @@
             }
         });
 
-        audioPlayer.addEventListener('ended', nextTrack);
+        audioPlayer.addEventListener('ended', () => {
+            if (repeatMode === 'one') {
+                audioPlayer.currentTime = 0;
+                audioPlayer.play();
+            } else {
+                nextTrack();
+            }
+        });
 
         meltNextBtn.addEventListener('click', nextTrack);
         meltPrevBtn.addEventListener('click', prevTrack);
+
+        const meltRepeatBtn = document.getElementById('meltRepeat');
+
+        function updateRepeatButton() {
+            if (repeatMode === 'one') {
+                meltRepeatBtn.textContent = '🔂';
+                meltRepeatBtn.classList.add('active');
+                meltRepeatBtn.setAttribute('aria-label', 'Repitiendo esta canción');
+            } else {
+                meltRepeatBtn.textContent = '🔁';
+                meltRepeatBtn.classList.add('active');
+                meltRepeatBtn.setAttribute('aria-label', 'Repitiendo lista');
+            }
+        }
+
+        meltRepeatBtn.addEventListener('click', () => {
+            repeatMode = (repeatMode === 'all') ? 'one' : 'all';
+            updateRepeatButton();
+        });
+
+        updateRepeatButton();
 
         function updateVolumeIcon(val) {
             if (val == 0) volumeIcon.textContent = '🔇';
