@@ -363,30 +363,29 @@
 
     <script>
         const ANIME_LIST = [
-            "Kimetsu no Yaiba",
-            "One Piece",
-            "Dragon Ball",
-            "Nanatsu no Taizai",
-            "Naruto",
-            "Classroom of the Elite",
-            "Fire Force",
-            "Kaguya-sama: Love Is War",
-            "Tamako Love Story",
-            "Haiyore! Nyaruko-san",
-            "My Love Story with Yamada-kun at Lv999",
-            "The 100 Girlfriends Who Really, Really, Really, Really, Really Love You",
-            "Fuufu Ijou, Koibito Miman"
+            { title: "Kimetsu no Yaiba", crunchyroll: "https://www.crunchyroll.com/series/GY5P48XEY/demon-slayer-kimetsu-no-yaiba" },
+            { title: "One Piece", crunchyroll: "https://www.crunchyroll.com/series/GRMG8ZQZR/one-piece" },
+            { title: "Dragon Ball", crunchyroll: "https://www.crunchyroll.com/series/G8DHV7W21/dragon-ball" },
+            { title: "Nanatsu no Taizai", crunchyroll: null },
+            { title: "Naruto", crunchyroll: "https://www.crunchyroll.com/series/GY9PJ5KWR/naruto" },
+            { title: "Classroom of the Elite", crunchyroll: "https://www.crunchyroll.com/series/GRVN8MNQY/classroom-of-the-elite" },
+            { title: "Fire Force", crunchyroll: "https://www.crunchyroll.com/series/GYQWNXPZY/fire-force" },
+            { title: "Kaguya-sama: Love Is War", crunchyroll: "https://www.crunchyroll.com/series/GRJ0J828Y/kaguya-sama-love-is-war" },
+            { title: "Tamako Love Story", crunchyroll: null },
+            { title: "Haiyore! Nyaruko-san", crunchyroll: "https://www.crunchyroll.com/series/G6VNM3EDR/nyarko-san-another-crawling-chaos" },
+            { title: "My Love Story with Yamada-kun at Lv999", crunchyroll: "https://www.crunchyroll.com/series/GNVHKNPQ7/my-love-story-with-yamada-kun-at-lv999" },
+            { title: "The 100 Girlfriends Who Really, Really, Really, Really, Really Love You", crunchyroll: "https://www.crunchyroll.com/series/GNVHKN933/the-100-girlfriends-who-really-really-really-really-really-love-you" },
+            { title: "Fuufu Ijou, Koibito Miman", crunchyroll: "https://www.crunchyroll.com/series/GJ0H7Q5N3/more-than-a-married-couple-but-not-lovers" }
         ];
 
         const animeCarousel = document.getElementById('animeCarousel');
 
-        async function loadAnime(title) {
+        async function loadAnimeImage(title) {
             const query = `
                 query ($search: String) {
                     Media(search: $search, type: ANIME) {
                         title { romaji english }
                         coverImage { large }
-                        siteUrl
                     }
                 }
             `;
@@ -401,51 +400,60 @@
                 if (!media) return null;
                 return {
                     title: media.title.english || media.title.romaji,
-                    image: media.coverImage.large,
-                    url: media.siteUrl
+                    image: media.coverImage.large
                 };
             } catch (e) {
-                console.error('No se pudo cargar', title, e);
+                console.error('No se pudo cargar la carátula de', title, e);
                 return null;
             }
         }
 
-        function renderAnimeCard(data, fallbackTitle) {
+        function renderAnimeCard(item, imgData, index) {
             const card = document.createElement('a');
-            card.className = 'anime-card';
+            card.className = 'anime-card reveal-card';
+            card.style.transitionDelay = (index * 0.06) + 's';
             card.target = '_blank';
             card.rel = 'noopener noreferrer';
+            card.href = item.crunchyroll || ('https://www.crunchyroll.com/search?q=' + encodeURIComponent(item.title));
 
-            if (data) {
-                card.href = data.url;
+            const displayTitle = (imgData && imgData.title) || item.title;
+
+            if (imgData) {
                 card.innerHTML = `
                     <div class="anime-card-img-wrap">
-                        <img src="${data.image}" alt="${data.title}" loading="lazy">
+                        <img src="${imgData.image}" alt="${displayTitle}" loading="lazy">
                     </div>
-                    <div class="anime-card-title">${data.title}</div>
+                    <div class="anime-card-title">${displayTitle}</div>
                 `;
             } else {
-                card.href = '#';
                 card.innerHTML = `
                     <div class="anime-card-img-wrap anime-card-placeholder">🎞️</div>
-                    <div class="anime-card-title">${fallbackTitle}</div>
+                    <div class="anime-card-title">${displayTitle}</div>
                 `;
             }
             return card;
         }
 
         async function initAnimeCarousel() {
-            ANIME_LIST.forEach(title => {
-                const card = renderAnimeCard(null, title);
-                card.dataset.title = title;
+            const cards = ANIME_LIST.map((item, i) => {
+                const card = renderAnimeCard(item, null, i);
+                card.dataset.title = item.title;
                 animeCarousel.appendChild(card);
+                return card;
             });
 
-            for (const title of ANIME_LIST) {
-                const data = await loadAnime(title);
-                if (data) {
-                    const oldCard = animeCarousel.querySelector(`[data-title="${CSS.escape(title)}"]`);
-                    const newCard = renderAnimeCard(data, title);
+            // Animación de entrada escalonada
+            requestAnimationFrame(() => {
+                cards.forEach(card => card.classList.add('reveal-card-in'));
+            });
+
+            for (let i = 0; i < ANIME_LIST.length; i++) {
+                const item = ANIME_LIST[i];
+                const imgData = await loadAnimeImage(item.title);
+                if (imgData) {
+                    const oldCard = animeCarousel.querySelector(`[data-title="${CSS.escape(item.title)}"]`);
+                    const newCard = renderAnimeCard(item, imgData, i);
+                    newCard.classList.add('reveal-card-in');
                     if (oldCard) oldCard.replaceWith(newCard);
                 }
             }
