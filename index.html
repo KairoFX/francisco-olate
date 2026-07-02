@@ -797,6 +797,11 @@
                         <button class="ytm-ctrl-btn" id="ytmNext" aria-label="Siguiente">⏭</button>
                         <button class="ytm-ctrl-btn" id="ytmToggleResults" aria-label="Ver resultados">☰</button>
                     </div>
+
+                    <div class="ytm-volume">
+                        <span class="ytm-volume-icon" id="ytmVolumeIcon">🔊</span>
+                        <input type="range" class="ytm-volume-slider" id="ytmVolumeSlider" min="0" max="100" value="70" aria-label="Volumen" />
+                    </div>
                 </div>
 
                 <button class="ytm-change-key" id="ytmChangeKey">Cambiar API Key</button>
@@ -1100,6 +1105,10 @@
             const ytmNextBtn = document.getElementById('ytmNext');
             const ytmLikeBtn = document.getElementById('ytmLike');
             const ytmToggleResults = document.getElementById('ytmToggleResults');
+            const ytmVolumeSlider = document.getElementById('ytmVolumeSlider');
+            const ytmVolumeIcon = document.getElementById('ytmVolumeIcon');
+
+            let ytmVolumeValue = 70;
 
             let ytmQueue = [];
             let ytmQueueIndex = -1;
@@ -1171,7 +1180,11 @@
                         width: '1',
                         playerVars: { autoplay: 0, controls: 0, disablekb: 1 },
                         events: {
-                            onReady: () => { ytmPlayerReady = true; resolve(ytmPlayer); },
+                            onReady: () => {
+                                ytmPlayerReady = true;
+                                ytmPlayer.setVolume(ytmVolumeValue);
+                                resolve(ytmPlayer);
+                            },
                             onStateChange: ytmOnStateChange
                         }
                     });
@@ -1324,6 +1337,30 @@
             ytmSearchBtn.addEventListener('click', ytmDoSearch);
             ytmSearchInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') ytmDoSearch();
+            });
+
+            function ytmUpdateVolumeIcon(val) {
+                if (val == 0) ytmVolumeIcon.textContent = '🔇';
+                else if (val < 50) ytmVolumeIcon.textContent = '🔉';
+                else ytmVolumeIcon.textContent = '🔊';
+            }
+
+            ytmVolumeSlider.addEventListener('input', () => {
+                ytmVolumeValue = Number(ytmVolumeSlider.value);
+                ytmUpdateVolumeIcon(ytmVolumeValue);
+                if (ytmPlayer && typeof ytmPlayer.setVolume === 'function') {
+                    ytmPlayer.setVolume(ytmVolumeValue);
+                }
+            });
+
+            ytmVolumeIcon.addEventListener('click', () => {
+                if (ytmVolumeSlider.value > 0) {
+                    ytmVolumeSlider.dataset.prev = ytmVolumeSlider.value;
+                    ytmVolumeSlider.value = 0;
+                } else {
+                    ytmVolumeSlider.value = ytmVolumeSlider.dataset.prev || 70;
+                }
+                ytmVolumeSlider.dispatchEvent(new Event('input'));
             });
         })();
     </script>
