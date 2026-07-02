@@ -1754,64 +1754,6 @@ strong { color: var(--text); font-weight: 600; }
 
 .ytm-change-key:hover { color: var(--text-muted); }
 
-.ytm-volume {
-  display: flex;
-  align-items: center;
-  gap: .55rem;
-  margin-top: .7rem;
-  padding-top: .6rem;
-  border-top: 1px solid rgba(0,0,0,.1);
-}
-
-.ytm-volume-icon {
-  font-size: .82rem;
-  cursor: pointer;
-  flex-shrink: 0;
-  width: 16px;
-  text-align: center;
-}
-
-.ytm-volume-slider {
-  flex: 1;
-  -webkit-appearance: none;
-  appearance: none;
-  height: 4px;
-  border-radius: var(--r-full);
-  background: rgba(0,0,0,.15);
-  outline: none;
-  cursor: pointer;
-}
-
-.ytm-volume-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: #0a0a0a;
-  cursor: pointer;
-  transition: transform .15s;
-}
-
-.ytm-volume-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-}
-
-.ytm-volume-slider::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: #0a0a0a;
-  border: none;
-  cursor: pointer;
-}
-
-.ytm-volume-slider::-moz-range-track {
-  height: 4px;
-  border-radius: var(--r-full);
-  background: rgba(0,0,0,.15);
-}
-
 #ytmPlayerHost {
   width: 1px;
   height: 1px;
@@ -2000,4 +1942,262 @@ strong { color: var(--text); font-weight: 600; }
   .anime-card { width: 120px; }
   .anime-arrow { width: 30px; height: 30px; font-size: 1.1rem; }
   .anime-stage { padding: 1.75rem .5rem 2rem; }
+}
+
+/* ===== Manga carousel ===== */
+.manga-stage {
+  background: radial-gradient(120% 140% at 50% 0%, #40200f 0%, #241209 55%, #140a05 100%);
+  border-radius: var(--r-xl);
+  padding: 2.25rem 1rem 2.5rem;
+  box-shadow: 0 20px 60px rgba(20,10,5,.35);
+  position: relative;
+  overflow: hidden;
+}
+
+.manga-stage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(245,158,11,.22), transparent 40%),
+    radial-gradient(circle at 85% 75%, rgba(239,68,68,.22), transparent 40%);
+  pointer-events: none;
+}
+
+.manga-carousel-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  z-index: 1;
+}
+
+.manga-carousel {
+  display: flex;
+  gap: 1.1rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  padding: 1.75rem .5rem 1.25rem;
+  flex: 1;
+}
+
+.manga-carousel::-webkit-scrollbar {
+  height: 8px;
+}
+.manga-carousel::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,.15);
+  border-radius: var(--r-full);
+}
+.manga-carousel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.manga-card {
+  flex: 0 0 auto;
+  width: 150px;
+  scroll-snap-align: center;
+  display: block;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  background: #241407;
+  box-shadow: 0 6px 20px rgba(0,0,0,.35);
+  transition: transform .3s ease, box-shadow .3s ease, opacity .5s ease;
+  text-decoration: none;
+  opacity: 0;
+  transform: translateY(24px) scale(.94);
+  border: 1px solid rgba(255,255,255,.06);
+}
+
+.manga-card.reveal-card-in {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.manga-card:hover {
+  transform: translateY(-6px) scale(1.04);
+  box-shadow: 0 0 0 2px rgba(245,158,11,.5), 0 12px 30px rgba(239,68,68,.35), 0 0 30px rgba(245,158,11,.35);
+}
+
+.manga-card.centered {
+  transform: translateY(-10px) scale(1.08);
+  box-shadow: 0 0 0 2px rgba(239,68,68,.7), 0 0 45px rgba(245,158,11,.55), 0 18px 34px rgba(0,0,0,.4);
+  z-index: 2;
+}
+
+.manga-card.selected {
+  animation: manga-select-pulse .7s ease;
+  box-shadow: 0 0 0 3px rgba(245,158,11,.9), 0 0 55px rgba(239,68,68,.8);
+}
+
+@keyframes manga-select-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(245,158,11,.9), 0 0 0 rgba(239,68,68,.8); }
+  40%  { box-shadow: 0 0 0 6px rgba(245,158,11,.35), 0 0 60px rgba(239,68,68,.9); }
+  100% { box-shadow: 0 0 0 3px rgba(245,158,11,.9), 0 0 55px rgba(239,68,68,.8); }
+}
+
+.manga-card:hover .manga-card-img-wrap img,
+.manga-card.centered .manga-card-img-wrap img {
+  transform: scale(1.08);
+}
+
+.manga-card-img-wrap {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  background: #2e1a0c;
+  overflow: hidden;
+}
+
+.manga-card-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .4s ease;
+}
+
+.manga-card-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  opacity: .4;
+  animation: manga-placeholder-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes manga-placeholder-pulse {
+  0%, 100% { opacity: .25; transform: scale(1); }
+  50% { opacity: .5; transform: scale(1.08); }
+}
+
+.manga-card-title {
+  padding: .6rem .6rem .75rem;
+  font-size: .8rem;
+  font-weight: 600;
+  color: #ffe8d6;
+  line-height: 1.25;
+  transition: color .3s ease, text-shadow .3s ease;
+}
+
+.manga-card:hover .manga-card-title,
+.manga-card.centered .manga-card-title,
+.manga-card.selected .manga-card-title {
+  color: #ffffff;
+  text-shadow: 0 0 12px rgba(245,158,11,.9), 0 0 22px rgba(239,68,68,.7);
+}
+
+.manga-arrow {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.15);
+  background: rgba(255,255,255,.06);
+  color: #fff;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background .15s, transform .15s, box-shadow .15s;
+}
+
+.manga-arrow:hover {
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  transform: scale(1.08);
+  box-shadow: 0 0 20px rgba(245,158,11,.5);
+}
+
+@media (max-width: 640px) {
+  .manga-card { width: 120px; }
+  .manga-arrow { width: 30px; height: 30px; font-size: 1.1rem; }
+  .manga-stage { padding: 1.75rem .5rem 2rem; }
+}
+
+/* ===== Tráiler especial: Demon Slayer Infinity Castle ===== */
+.trailer-section {
+  padding-top: 2rem;
+}
+
+.trailer-showcase {
+  position: relative;
+  border-radius: var(--r-xl);
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  background: radial-gradient(120% 160% at 50% 0%, #2a0808 0%, #170404 60%, #0a0202 100%);
+  border: 1px solid rgba(239,68,68,.25);
+  box-shadow: 0 25px 70px rgba(20,2,2,.5), 0 0 0 1px rgba(245,158,11,.05) inset;
+  overflow: hidden;
+}
+
+.trailer-showcase-glow {
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(239,68,68,.28), transparent 45%),
+    radial-gradient(circle at 80% 20%, rgba(245,158,11,.22), transparent 45%),
+    radial-gradient(circle at 50% 100%, rgba(147,51,234,.18), transparent 50%);
+  pointer-events: none;
+  animation: trailer-glow-pulse 6s ease-in-out infinite;
+}
+
+@keyframes trailer-glow-pulse {
+  0%, 100% { opacity: .7; }
+  50% { opacity: 1; }
+}
+
+.trailer-badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .45rem 1rem;
+  border-radius: var(--r-full);
+  background: rgba(239,68,68,.15);
+  border: 1px solid rgba(239,68,68,.4);
+  color: #fca5a5;
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  margin-bottom: 1.25rem;
+  z-index: 1;
+}
+
+.trailer-title {
+  position: relative;
+  font-family: 'Sora', sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  line-height: 1.25;
+  color: #fff;
+  margin-bottom: .75rem;
+  z-index: 1;
+}
+
+.trailer-sub {
+  position: relative;
+  color: #e2c9c9;
+  max-width: 560px;
+  margin: 0 auto 2rem;
+  z-index: 1;
+}
+
+.trailer-frame {
+  position: relative;
+  max-width: 860px;
+  margin: 0 auto;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  box-shadow: 0 0 0 1px rgba(239,68,68,.35), 0 20px 60px rgba(0,0,0,.6), 0 0 60px rgba(245,158,11,.15);
+  z-index: 1;
+}
+
+.trailer-frame iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
 }
