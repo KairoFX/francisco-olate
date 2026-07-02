@@ -31,6 +31,7 @@
                 <a href="#sobre-mi">Sobre mí</a>
                 <a href="#estudio">Lo que estudio</a>
                 <a href="#intereses">Intereses</a>
+                <a href="#mangas">Mangas</a>
                 <a href="#hablemos" class="nav-cta">Hablemos 💬</a>
             </nav>
 
@@ -43,6 +44,7 @@
             <a href="#sobre-mi" onclick="closeMobile()">Sobre mí</a>
             <a href="#estudio" onclick="closeMobile()">Lo que estudio</a>
             <a href="#intereses" onclick="closeMobile()">Intereses</a>
+            <a href="#mangas" onclick="closeMobile()">Mangas</a>
             <a href="#hablemos" onclick="closeMobile()" class="mobile-cta">Hablemos 💬</a>
         </div>
     </header>
@@ -377,7 +379,22 @@
             { title: "Haiyore! Nyaruko-san", crunchyroll: "https://www.crunchyroll.com/series/G6VNM3EDR/nyarko-san-another-crawling-chaos" },
             { title: "My Love Story with Yamada-kun at Lv999", crunchyroll: "https://www.crunchyroll.com/series/GNVHKNPQ7/my-love-story-with-yamada-kun-at-lv999" },
             { title: "The 100 Girlfriends Who Really, Really, Really, Really, Really Love You", crunchyroll: "https://www.crunchyroll.com/series/GNVHKN933/the-100-girlfriends-who-really-really-really-really-really-love-you" },
-            { title: "Fuufu Ijou, Koibito Miman", crunchyroll: "https://www.crunchyroll.com/series/GJ0H7Q5N3/more-than-a-married-couple-but-not-lovers" }
+            { title: "Fuufu Ijou, Koibito Miman", crunchyroll: "https://www.crunchyroll.com/series/GJ0H7Q5N3/more-than-a-married-couple-but-not-lovers" },
+            { title: "Jujutsu Kaisen", crunchyroll: null },
+            { title: "Toradora!", crunchyroll: null },
+            { title: "Blue Box", crunchyroll: null },
+            { title: "Karakai Jouzu no Takagi-san", crunchyroll: null },
+            { title: "Rent-a-Girlfriend", crunchyroll: null },
+            { title: "DARLING in the FRANXX", crunchyroll: null },
+            { title: "Chunibyo Demo Koi ga Shitai", crunchyroll: null },
+            { title: "Zero no Tsukaima", crunchyroll: null },
+            { title: "TONIKAWA: Over the Moon For You", crunchyroll: null },
+            { title: "Gotoubun no Hanayome", crunchyroll: null },
+            { title: "Nisekoi", crunchyroll: null },
+            { title: "Netoge no Yome wa Onnanoko ja Nai to Omotta?", crunchyroll: null },
+            { title: "Jitsu wa Watashi wa", crunchyroll: null },
+            { title: "Tokyo Ghoul", crunchyroll: null },
+            { title: "Chainsaw Man", crunchyroll: null }
         ];
 
         const animeCarousel = document.getElementById('animeCarousel');
@@ -526,6 +543,227 @@
         });
         animeArrowRight.addEventListener('click', () => {
             animeCarousel.scrollBy({ left: animeScrollAmount() * 2, behavior: 'smooth' });
+        });
+    </script>
+
+    <section class="page-section trailer-section" id="trailer-especial">
+        <div class="container">
+
+            <div class="trailer-showcase reveal">
+                <div class="trailer-showcase-glow" aria-hidden="true"></div>
+                <div class="trailer-badge">🔥 Estreno especial</div>
+                <h2 class="trailer-title">Demon Slayer: Kimetsu no Yaiba<br><span class="gradient-text">Infinity Castle</span></h2>
+                <p class="trailer-sub">La batalla final ha comenzado. Este es el tráiler de la película que más espero.</p>
+
+                <div class="trailer-frame">
+                    <iframe
+                        src="https://www.youtube.com/embed/x7uLutVRBfI"
+                        title="Demon Slayer: Kimetsu no Yaiba Infinity Castle - Tráiler oficial"
+                        loading="lazy"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="page-section manga-section" id="mangas">
+        <div class="container">
+
+            <div class="section-label reveal">📖 Lo que leo</div>
+            <h2 class="section-title reveal">Mangas que me gustan</h2>
+            <div class="title-line reveal"></div>
+            <p class="reveal" style="max-width:600px;margin-top:.5rem;">Algunos de mis mangas favoritos. Desliza para ver todos — al seleccionar uno te lleva directo a buscarlo en MangaDex.</p>
+
+            <div class="manga-stage reveal mt-4">
+                <div class="manga-carousel-wrap">
+                    <button class="manga-arrow manga-arrow-left" id="mangaArrowLeft" aria-label="Anterior">‹</button>
+                    <div class="manga-carousel" id="mangaCarousel">
+                        <!-- Las tarjetas se generan por JavaScript -->
+                    </div>
+                    <button class="manga-arrow manga-arrow-right" id="mangaArrowRight" aria-label="Siguiente">›</button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <script>
+        const MANGA_LIST = [
+            { title: "Jujutsu Kaisen", mangadex: "https://mangadex.org/title/eef171f7-24d1-4a2a-9227-136fb1fbaf8b" },
+            { title: "Toradora!", mangadex: null },
+            { title: "Blue Box", mangadex: null },
+            { title: "Karakai Jouzu no Takagi-san", mangadex: null },
+            { title: "Rent-a-Girlfriend", mangadex: null },
+            { title: "DARLING in the FRANXX", mangadex: null },
+            { title: "Chunibyo Demo Koi ga Shitai", mangadex: null },
+            { title: "Zero no Tsukaima", mangadex: null },
+            { title: "TONIKAWA: Over the Moon For You", mangadex: null },
+            { title: "Gotoubun no Hanayome", mangadex: null },
+            { title: "Nisekoi", mangadex: null },
+            { title: "Netoge no Yome wa Onnanoko ja Nai to Omotta?", mangadex: null },
+            { title: "Jitsu wa Watashi wa", mangadex: null },
+            { title: "Tokyo Ghoul", mangadex: null },
+            { title: "Chainsaw Man", mangadex: null },
+            { title: "Kimetsu no Yaiba", mangadex: null },
+            { title: "One Piece", mangadex: null },
+            { title: "Dragon Ball", mangadex: null },
+            { title: "Nanatsu no Taizai", mangadex: null },
+            { title: "Naruto", mangadex: null },
+            { title: "Classroom of the Elite", mangadex: null },
+            { title: "Fire Force", mangadex: null },
+            { title: "Kaguya-sama: Love Is War", mangadex: null },
+            { title: "Tamako Love Story", mangadex: null },
+            { title: "Haiyore! Nyaruko-san", mangadex: null },
+            { title: "My Love Story with Yamada-kun at Lv999", mangadex: null },
+            { title: "The 100 Girlfriends Who Really, Really, Really, Really, Really Love You", mangadex: null },
+            { title: "Fuufu Ijou, Koibito Miman", mangadex: null }
+        ];
+
+        const mangaCarousel = document.getElementById('mangaCarousel');
+
+        function renderMangaCard(item, imgData, index) {
+            const card = document.createElement('a');
+            card.className = 'manga-card reveal-card';
+            card.style.transitionDelay = (index * 0.06) + 's';
+            card.target = '_blank';
+            card.rel = 'noopener noreferrer';
+            card.href = item.mangadex || ('https://mangadex.org/search?q=' + encodeURIComponent(item.title));
+
+            const displayTitle = (imgData && imgData.title) || item.title;
+
+            if (imgData) {
+                card.innerHTML = `
+                    <div class="manga-card-img-wrap">
+                        <img src="${imgData.image}" alt="${displayTitle}" loading="lazy">
+                    </div>
+                    <div class="manga-card-title">${displayTitle}</div>
+                `;
+            } else {
+                card.innerHTML = `
+                    <div class="manga-card-img-wrap manga-card-placeholder">📚</div>
+                    <div class="manga-card-title">${displayTitle}</div>
+                `;
+            }
+
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.manga-card.selected').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+            });
+
+            return card;
+        }
+
+        async function loadMangaImage(title) {
+            const query = `
+                query ($search: String) {
+                    Media(search: $search, type: MANGA) {
+                        title { romaji english }
+                        coverImage { large extraLarge }
+                    }
+                }
+            `;
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 8000);
+                const res = await fetch('https://graphql.anilist.co', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({ query, variables: { search: title } }),
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const json = await res.json();
+                const media = json.data && json.data.Media;
+                if (!media) return null;
+                return {
+                    title: media.title.english || media.title.romaji,
+                    image: media.coverImage.extraLarge || media.coverImage.large
+                };
+            } catch (e) {
+                console.error('No se pudo cargar la carátula de', title, e);
+                return null;
+            }
+        }
+
+        async function initMangaCarousel() {
+            const cards = MANGA_LIST.map((item, i) => {
+                const card = renderMangaCard(item, null, i);
+                card.dataset.title = item.title;
+                mangaCarousel.appendChild(card);
+                return card;
+            });
+
+            requestAnimationFrame(() => {
+                cards.forEach(card => card.classList.add('reveal-card-in'));
+            });
+
+            const results = await Promise.all(MANGA_LIST.map(item => loadMangaImage(item.title)));
+
+            results.forEach((imgData, i) => {
+                if (!imgData) return;
+                const item = MANGA_LIST[i];
+                const oldCard = mangaCarousel.querySelector(`[data-title="${CSS.escape(item.title)}"]`);
+                if (!oldCard) return;
+                const newCard = renderMangaCard(item, imgData, i);
+                newCard.classList.add('reveal-card-in');
+                oldCard.replaceWith(newCard);
+            });
+
+            setupMangaCenterDetection();
+        }
+
+        function setupMangaCenterDetection() {
+            function updateCentered() {
+                const wrapRect = mangaCarousel.getBoundingClientRect();
+                const centerX = wrapRect.left + wrapRect.width / 2;
+                let closest = null;
+                let closestDist = Infinity;
+
+                mangaCarousel.querySelectorAll('.manga-card').forEach(card => {
+                    const r = card.getBoundingClientRect();
+                    const cardCenter = r.left + r.width / 2;
+                    const dist = Math.abs(cardCenter - centerX);
+                    if (dist < closestDist) {
+                        closestDist = dist;
+                        closest = card;
+                    }
+                    card.classList.remove('centered');
+                });
+
+                if (closest) closest.classList.add('centered');
+            }
+
+            let ticking = false;
+            mangaCarousel.addEventListener('scroll', () => {
+                if (!ticking) {
+                    requestAnimationFrame(() => { updateCentered(); ticking = false; });
+                    ticking = true;
+                }
+            });
+
+            window.addEventListener('resize', updateCentered);
+            updateCentered();
+        }
+
+        initMangaCarousel();
+
+        const mangaArrowLeft = document.getElementById('mangaArrowLeft');
+        const mangaArrowRight = document.getElementById('mangaArrowRight');
+
+        function mangaScrollAmount() {
+            const card = mangaCarousel.querySelector('.manga-card');
+            return card ? card.offsetWidth + 16 : 200;
+        }
+
+        mangaArrowLeft.addEventListener('click', () => {
+            mangaCarousel.scrollBy({ left: -mangaScrollAmount() * 2, behavior: 'smooth' });
+        });
+        mangaArrowRight.addEventListener('click', () => {
+            mangaCarousel.scrollBy({ left: mangaScrollAmount() * 2, behavior: 'smooth' });
         });
     </script>
 
@@ -796,11 +1034,6 @@
                         <button class="ytm-ctrl-btn ytm-ctrl-main" id="ytmPlay" aria-label="Reproducir">▶</button>
                         <button class="ytm-ctrl-btn" id="ytmNext" aria-label="Siguiente">⏭</button>
                         <button class="ytm-ctrl-btn" id="ytmToggleResults" aria-label="Ver resultados">☰</button>
-                    </div>
-
-                    <div class="ytm-volume">
-                        <span class="ytm-volume-icon" id="ytmVolumeIcon">🔊</span>
-                        <input type="range" class="ytm-volume-slider" id="ytmVolumeSlider" min="0" max="100" value="70" aria-label="Volumen" />
                     </div>
                 </div>
 
@@ -1105,10 +1338,6 @@
             const ytmNextBtn = document.getElementById('ytmNext');
             const ytmLikeBtn = document.getElementById('ytmLike');
             const ytmToggleResults = document.getElementById('ytmToggleResults');
-            const ytmVolumeSlider = document.getElementById('ytmVolumeSlider');
-            const ytmVolumeIcon = document.getElementById('ytmVolumeIcon');
-
-            let ytmVolumeValue = 70;
 
             let ytmQueue = [];
             let ytmQueueIndex = -1;
@@ -1180,11 +1409,7 @@
                         width: '1',
                         playerVars: { autoplay: 0, controls: 0, disablekb: 1 },
                         events: {
-                            onReady: () => {
-                                ytmPlayerReady = true;
-                                ytmPlayer.setVolume(ytmVolumeValue);
-                                resolve(ytmPlayer);
-                            },
+                            onReady: () => { ytmPlayerReady = true; resolve(ytmPlayer); },
                             onStateChange: ytmOnStateChange
                         }
                     });
@@ -1337,30 +1562,6 @@
             ytmSearchBtn.addEventListener('click', ytmDoSearch);
             ytmSearchInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') ytmDoSearch();
-            });
-
-            function ytmUpdateVolumeIcon(val) {
-                if (val == 0) ytmVolumeIcon.textContent = '🔇';
-                else if (val < 50) ytmVolumeIcon.textContent = '🔉';
-                else ytmVolumeIcon.textContent = '🔊';
-            }
-
-            ytmVolumeSlider.addEventListener('input', () => {
-                ytmVolumeValue = Number(ytmVolumeSlider.value);
-                ytmUpdateVolumeIcon(ytmVolumeValue);
-                if (ytmPlayer && typeof ytmPlayer.setVolume === 'function') {
-                    ytmPlayer.setVolume(ytmVolumeValue);
-                }
-            });
-
-            ytmVolumeIcon.addEventListener('click', () => {
-                if (ytmVolumeSlider.value > 0) {
-                    ytmVolumeSlider.dataset.prev = ytmVolumeSlider.value;
-                    ytmVolumeSlider.value = 0;
-                } else {
-                    ytmVolumeSlider.value = ytmVolumeSlider.dataset.prev || 70;
-                }
-                ytmVolumeSlider.dispatchEvent(new Event('input'));
             });
         })();
     </script>
