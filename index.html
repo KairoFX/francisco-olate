@@ -734,6 +734,79 @@
 
     </div>
 
+    <div class="ytm-bubble-wrap" id="ytmBubbleWrap">
+
+        <button class="ytm-bubble" id="ytmBubble" aria-label="Abrir YouTube Music">
+            <svg class="ytm-bubble-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="11" fill="#fff"/>
+                <circle cx="12" cy="12" r="11" fill="none" stroke="#0a0a0a" stroke-width="1"/>
+                <path d="M9.8 8.3v7.4l6.2-3.7-6.2-3.7z" fill="#0a0a0a"/>
+            </svg>
+        </button>
+
+        <div class="ytm-panel" id="ytmPanel">
+
+            <div class="ytm-panel-header">
+                <span class="ytm-logo">▶ YouTube Music</span>
+                <button class="ytm-close" id="ytmClose" aria-label="Cerrar">✕</button>
+            </div>
+
+            <div class="ytm-apikey-box" id="ytmApiKeyBox">
+                <p class="ytm-hint">Para buscar música real necesitas tu propia API Key de YouTube Data API v3 (gratuita).</p>
+                <input type="password" id="ytmApiKeyInput" class="ytm-input" placeholder="Pega tu API Key aquí" autocomplete="off" />
+                <div class="ytm-apikey-actions">
+                    <button class="ytm-btn-small" id="ytmApiKeySave">Guardar</button>
+                    <a href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank" rel="noopener noreferrer" class="ytm-apikey-link">¿Cómo obtengo una? ↗</a>
+                </div>
+            </div>
+
+            <div class="ytm-body" id="ytmBody" style="display:none;">
+
+                <div class="ytm-search-row">
+                    <input type="text" id="ytmSearchInput" class="ytm-input" placeholder="Buscar canción o artista..." />
+                    <button class="ytm-search-btn" id="ytmSearchBtn" aria-label="Buscar">🔍</button>
+                </div>
+
+                <div class="ytm-results" id="ytmResults"></div>
+
+                <div class="ytm-player" id="ytmPlayerBox">
+                    <div class="ytm-art-stage">
+                        <div class="ytm-disc" id="ytmDisc"></div>
+                        <div class="ytm-art" id="ytmArt">
+                            <span class="ytm-art-placeholder">🎵</span>
+                        </div>
+                    </div>
+
+                    <div class="ytm-track-info">
+                        <div class="ytm-title" id="ytmTitle">Elige una canción</div>
+                        <div class="ytm-artist" id="ytmArtist">Busca algo arriba ↑</div>
+                    </div>
+
+                    <div class="ytm-progress" id="ytmProgressBar">
+                        <div class="ytm-progress-fill" id="ytmProgressFill"></div>
+                    </div>
+                    <div class="ytm-times">
+                        <span id="ytmCurrent">0:00</span>
+                        <span id="ytmDuration">0:00</span>
+                    </div>
+
+                    <div class="ytm-controls">
+                        <button class="ytm-ctrl-btn" id="ytmLike" aria-label="Me gusta">♡</button>
+                        <button class="ytm-ctrl-btn" id="ytmPrev" aria-label="Anterior">⏮</button>
+                        <button class="ytm-ctrl-btn ytm-ctrl-main" id="ytmPlay" aria-label="Reproducir">▶</button>
+                        <button class="ytm-ctrl-btn" id="ytmNext" aria-label="Siguiente">⏭</button>
+                        <button class="ytm-ctrl-btn" id="ytmToggleResults" aria-label="Ver resultados">☰</button>
+                    </div>
+                </div>
+
+                <button class="ytm-change-key" id="ytmChangeKey">Cambiar API Key</button>
+            </div>
+
+            <div id="ytmPlayerHost"></div>
+        </div>
+
+    </div>
+
     <audio id="musicPlayer" preload="metadata"></audio>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
@@ -995,6 +1068,264 @@
             }
             volumeSlider.dispatchEvent(new Event('input'));
         });
+
+        // 🎵 YOUTUBE MUSIC BUBBLE — búsqueda real vía YouTube Data API v3
+        (function () {
+            const YTM_KEY_STORAGE = 'ytm_api_key';
+
+            const ytmBubbleWrap = document.getElementById('ytmBubbleWrap');
+            const ytmBubble = document.getElementById('ytmBubble');
+            const ytmPanel = document.getElementById('ytmPanel');
+            const ytmClose = document.getElementById('ytmClose');
+
+            const ytmApiKeyBox = document.getElementById('ytmApiKeyBox');
+            const ytmApiKeyInput = document.getElementById('ytmApiKeyInput');
+            const ytmApiKeySave = document.getElementById('ytmApiKeySave');
+            const ytmChangeKey = document.getElementById('ytmChangeKey');
+            const ytmBody = document.getElementById('ytmBody');
+
+            const ytmSearchInput = document.getElementById('ytmSearchInput');
+            const ytmSearchBtn = document.getElementById('ytmSearchBtn');
+            const ytmResults = document.getElementById('ytmResults');
+
+            const ytmArt = document.getElementById('ytmArt');
+            const ytmTitle = document.getElementById('ytmTitle');
+            const ytmArtist = document.getElementById('ytmArtist');
+            const ytmProgressBar = document.getElementById('ytmProgressBar');
+            const ytmProgressFill = document.getElementById('ytmProgressFill');
+            const ytmCurrent = document.getElementById('ytmCurrent');
+            const ytmDuration = document.getElementById('ytmDuration');
+            const ytmPlayBtn = document.getElementById('ytmPlay');
+            const ytmPrevBtn = document.getElementById('ytmPrev');
+            const ytmNextBtn = document.getElementById('ytmNext');
+            const ytmLikeBtn = document.getElementById('ytmLike');
+            const ytmToggleResults = document.getElementById('ytmToggleResults');
+
+            let ytmQueue = [];
+            let ytmQueueIndex = -1;
+            let ytmPlayer = null;
+            let ytmPlayerReady = false;
+            let ytmProgressTimer = null;
+
+            function ytmGetKey() {
+                return localStorage.getItem(YTM_KEY_STORAGE) || '';
+            }
+
+            function ytmShowBody(show) {
+                ytmApiKeyBox.style.display = show ? 'none' : 'block';
+                ytmBody.style.display = show ? 'block' : 'none';
+            }
+
+            ytmShowBody(!!ytmGetKey());
+
+            ytmBubble.addEventListener('click', () => {
+                ytmPanel.classList.toggle('open');
+            });
+
+            ytmClose.addEventListener('click', () => {
+                ytmPanel.classList.remove('open');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!ytmBubbleWrap.contains(e.target)) {
+                    ytmPanel.classList.remove('open');
+                }
+            });
+
+            ytmApiKeySave.addEventListener('click', () => {
+                const val = ytmApiKeyInput.value.trim();
+                if (!val) return;
+                localStorage.setItem(YTM_KEY_STORAGE, val);
+                ytmApiKeyInput.value = '';
+                ytmShowBody(true);
+            });
+
+            ytmChangeKey.addEventListener('click', () => {
+                localStorage.removeItem(YTM_KEY_STORAGE);
+                ytmShowBody(false);
+            });
+
+            function formatYtmTime(sec) {
+                if (!sec || isNaN(sec)) return '0:00';
+                const m = Math.floor(sec / 60);
+                const s = Math.floor(sec % 60).toString().padStart(2, '0');
+                return m + ':' + s;
+            }
+
+            function ytmLoadPlayerApi() {
+                return new Promise((resolve) => {
+                    if (window.YT && window.YT.Player) { resolve(); return; }
+                    const tag = document.createElement('script');
+                    tag.src = 'https://www.youtube.com/iframe_api';
+                    document.head.appendChild(tag);
+                    window.onYouTubeIframeAPIReady = () => resolve();
+                });
+            }
+
+            async function ytmEnsurePlayer() {
+                if (ytmPlayer) return ytmPlayer;
+                await ytmLoadPlayerApi();
+                return new Promise((resolve) => {
+                    ytmPlayer = new YT.Player('ytmPlayerHost', {
+                        height: '1',
+                        width: '1',
+                        playerVars: { autoplay: 0, controls: 0, disablekb: 1 },
+                        events: {
+                            onReady: () => { ytmPlayerReady = true; resolve(ytmPlayer); },
+                            onStateChange: ytmOnStateChange
+                        }
+                    });
+                });
+            }
+
+            function ytmOnStateChange(e) {
+                if (e.data === YT.PlayerState.PLAYING) {
+                    ytmPlayBtn.textContent = '⏸';
+                    ytmPanel.classList.add('playing');
+                    ytmStartProgressTimer();
+                } else if (e.data === YT.PlayerState.PAUSED) {
+                    ytmPlayBtn.textContent = '▶';
+                    ytmPanel.classList.remove('playing');
+                } else if (e.data === YT.PlayerState.ENDED) {
+                    ytmPlayNext();
+                }
+            }
+
+            function ytmStartProgressTimer() {
+                clearInterval(ytmProgressTimer);
+                ytmProgressTimer = setInterval(() => {
+                    if (!ytmPlayer || typeof ytmPlayer.getCurrentTime !== 'function') return;
+                    const dur = ytmPlayer.getDuration() || 0;
+                    const cur = ytmPlayer.getCurrentTime() || 0;
+                    if (dur > 0) {
+                        ytmProgressFill.style.width = (cur / dur * 100) + '%';
+                        ytmCurrent.textContent = formatYtmTime(cur);
+                        ytmDuration.textContent = formatYtmTime(dur);
+                    }
+                }, 500);
+            }
+
+            ytmProgressBar.addEventListener('click', (e) => {
+                if (!ytmPlayer || typeof ytmPlayer.getDuration !== 'function') return;
+                const rect = ytmProgressBar.getBoundingClientRect();
+                const pct = (e.clientX - rect.left) / rect.width;
+                const dur = ytmPlayer.getDuration() || 0;
+                ytmPlayer.seekTo(dur * pct, true);
+            });
+
+            async function ytmSearch(query) {
+                const key = ytmGetKey();
+                if (!key) { ytmShowBody(false); return; }
+                ytmResults.innerHTML = '<div class="ytm-result-status">Buscando...</div>';
+                try {
+                    const url = 'https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoCategoryId=10&maxResults=8&q=' + encodeURIComponent(query) + '&key=' + encodeURIComponent(key);
+                    const res = await fetch(url);
+                    const data = await res.json();
+                    if (data.error) {
+                        ytmResults.innerHTML = '<div class="ytm-result-status">⚠️ ' + (data.error.message || 'Error de API. Revisa tu API Key.') + '</div>';
+                        return;
+                    }
+                    const items = data.items || [];
+                    if (!items.length) {
+                        ytmResults.innerHTML = '<div class="ytm-result-status">Sin resultados 😕</div>';
+                        return;
+                    }
+                    ytmQueue = items.map(it => ({
+                        id: it.id.videoId,
+                        title: it.snippet.title,
+                        channel: it.snippet.channelTitle,
+                        thumb: it.snippet.thumbnails.medium ? it.snippet.thumbnails.medium.url : it.snippet.thumbnails.default.url
+                    }));
+                    ytmRenderResults();
+                } catch (err) {
+                    ytmResults.innerHTML = '<div class="ytm-result-status">⚠️ No se pudo conectar a YouTube.</div>';
+                }
+            }
+
+            function ytmDecodeHtml(str) {
+                const el = document.createElement('textarea');
+                el.innerHTML = str;
+                return el.value;
+            }
+
+            function ytmRenderResults() {
+                ytmResults.innerHTML = '';
+                ytmQueue.forEach((track, idx) => {
+                    const item = document.createElement('div');
+                    item.className = 'ytm-result-item';
+                    item.innerHTML =
+                        '<img class="ytm-result-thumb" src="' + track.thumb + '" alt="" />' +
+                        '<div class="ytm-result-text">' +
+                            '<div class="ytm-result-title">' + ytmDecodeHtml(track.title) + '</div>' +
+                            '<div class="ytm-result-channel">' + ytmDecodeHtml(track.channel) + '</div>' +
+                        '</div>';
+                    item.addEventListener('click', () => ytmPlayTrack(idx));
+                    ytmResults.appendChild(item);
+                });
+            }
+
+            async function ytmPlayTrack(idx) {
+                if (idx < 0 || idx >= ytmQueue.length) return;
+                ytmQueueIndex = idx;
+                const track = ytmQueue[idx];
+                ytmTitle.textContent = ytmDecodeHtml(track.title);
+                ytmArtist.textContent = ytmDecodeHtml(track.channel);
+                ytmArt.innerHTML = '<img src="' + track.thumb.replace('/mqdefault', '/hqdefault') + '" alt="' + ytmDecodeHtml(track.title) + '" />';
+                ytmProgressFill.style.width = '0%';
+                ytmCurrent.textContent = '0:00';
+                ytmDuration.textContent = '0:00';
+
+                const player = await ytmEnsurePlayer();
+                player.loadVideoById(track.id);
+                player.playVideo();
+            }
+
+            function ytmPlayNext() {
+                if (!ytmQueue.length) return;
+                ytmPlayTrack((ytmQueueIndex + 1) % ytmQueue.length);
+            }
+
+            function ytmPlayPrev() {
+                if (!ytmQueue.length) return;
+                ytmPlayTrack((ytmQueueIndex - 1 + ytmQueue.length) % ytmQueue.length);
+            }
+
+            ytmPlayBtn.addEventListener('click', async () => {
+                if (!ytmPlayer) {
+                    if (ytmQueue.length) ytmPlayTrack(0);
+                    return;
+                }
+                const state = ytmPlayer.getPlayerState();
+                if (state === YT.PlayerState.PLAYING) {
+                    ytmPlayer.pauseVideo();
+                } else {
+                    ytmPlayer.playVideo();
+                }
+            });
+
+            ytmNextBtn.addEventListener('click', ytmPlayNext);
+            ytmPrevBtn.addEventListener('click', ytmPlayPrev);
+
+            ytmLikeBtn.addEventListener('click', () => {
+                ytmLikeBtn.classList.toggle('liked');
+                ytmLikeBtn.textContent = ytmLikeBtn.classList.contains('liked') ? '♥' : '♡';
+            });
+
+            ytmToggleResults.addEventListener('click', () => {
+                ytmResults.style.display = (ytmResults.style.display === 'none') ? 'block' : 'none';
+            });
+
+            function ytmDoSearch() {
+                const q = ytmSearchInput.value.trim();
+                if (!q) return;
+                ytmSearch(q);
+            }
+
+            ytmSearchBtn.addEventListener('click', ytmDoSearch);
+            ytmSearchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') ytmDoSearch();
+            });
+        })();
     </script>
 
 </body>
