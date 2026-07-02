@@ -612,7 +612,7 @@
             <div class="section-label reveal">📖 Lo que leo</div>
             <h2 class="section-title reveal">Mangas que me gustan</h2>
             <div class="title-line reveal"></div>
-            <p class="reveal" style="max-width:600px;margin-top:.5rem;">Algunos de mis mangas favoritos. Desliza para ver todos — al seleccionar uno te lleva directo a buscarlo en MangaDex.</p>
+            <p class="reveal" style="max-width:600px;margin-top:.5rem;">Algunos de mis mangas favoritos. Desliza para ver todos — al seleccionar uno te lleva directo a leerlo en YupManga.</p>
 
             <div class="manga-stage reveal mt-4">
                 <div class="manga-carousel-wrap">
@@ -629,34 +629,34 @@
 
     <script>
         const MANGA_LIST = [
-            { title: "Jujutsu Kaisen", mangadex: "https://mangadex.org/title/eef171f7-24d1-4a2a-9227-136fb1fbaf8b" },
-            { title: "Toradora!", mangadex: null },
-            { title: "Blue Box", mangadex: null },
-            { title: "Karakai Jouzu no Takagi-san", mangadex: null },
-            { title: "Rent-a-Girlfriend", mangadex: null },
-            { title: "DARLING in the FRANXX", mangadex: null },
-            { title: "Chunibyo Demo Koi ga Shitai", mangadex: null },
-            { title: "Zero no Tsukaima", mangadex: null },
-            { title: "TONIKAWA: Over the Moon For You", mangadex: null },
-            { title: "Gotoubun no Hanayome", mangadex: null },
-            { title: "Nisekoi", mangadex: null },
-            { title: "Netoge no Yome wa Onnanoko ja Nai to Omotta?", mangadex: null },
-            { title: "Jitsu wa Watashi wa", mangadex: null },
-            { title: "Tokyo Ghoul", mangadex: null },
-            { title: "Chainsaw Man", mangadex: null },
-            { title: "Kimetsu no Yaiba", mangadex: null },
-            { title: "One Piece", mangadex: null },
-            { title: "Dragon Ball", mangadex: null },
-            { title: "Nanatsu no Taizai", mangadex: null },
-            { title: "Naruto", mangadex: null },
-            { title: "Classroom of the Elite", mangadex: null },
-            { title: "Fire Force", mangadex: null },
-            { title: "Kaguya-sama: Love Is War", mangadex: null },
-            { title: "Tamako Love Story", mangadex: null },
-            { title: "Haiyore! Nyaruko-san", mangadex: null },
-            { title: "My Love Story with Yamada-kun at Lv999", mangadex: null },
-            { title: "The 100 Girlfriends Who Really, Really, Really, Really, Really Love You", mangadex: null },
-            { title: "Fuufu Ijou, Koibito Miman", mangadex: null }
+            { title: "Jujutsu Kaisen", yupmanga: "https://www.yupmanga.com/series.php?id=0J37YXC44KHCZ" },
+            { title: "Toradora!", yupmanga: null },
+            { title: "Blue Box", yupmanga: null },
+            { title: "Karakai Jouzu no Takagi-san", yupmanga: null },
+            { title: "Rent-a-Girlfriend", yupmanga: null },
+            { title: "DARLING in the FRANXX", yupmanga: null },
+            { title: "Chunibyo Demo Koi ga Shitai", yupmanga: null },
+            { title: "Zero no Tsukaima", yupmanga: null },
+            { title: "TONIKAWA: Over the Moon For You", yupmanga: null },
+            { title: "Gotoubun no Hanayome", yupmanga: null },
+            { title: "Nisekoi", yupmanga: "https://www.yupmanga.com/series.php?id=UMPUYEOOHXHI1" },
+            { title: "Netoge no Yome wa Onnanoko ja Nai to Omotta?", yupmanga: null },
+            { title: "Jitsu wa Watashi wa", yupmanga: null },
+            { title: "Tokyo Ghoul", yupmanga: "https://www.yupmanga.com/series.php?id=8KYJ5AM37GGI3" },
+            { title: "Chainsaw Man", yupmanga: "https://www.yupmanga.com/series.php?id=63Q3H0MVARAN7" },
+            { title: "Kimetsu no Yaiba", yupmanga: "https://www.yupmanga.com/series.php?id=0HS6Y78QGKW9C" },
+            { title: "One Piece", yupmanga: null },
+            { title: "Dragon Ball", yupmanga: null },
+            { title: "Nanatsu no Taizai", yupmanga: null },
+            { title: "Naruto", yupmanga: null },
+            { title: "Classroom of the Elite", yupmanga: null },
+            { title: "Fire Force", yupmanga: null },
+            { title: "Kaguya-sama: Love Is War", yupmanga: null },
+            { title: "Tamako Love Story", yupmanga: null },
+            { title: "Haiyore! Nyaruko-san", yupmanga: null },
+            { title: "My Love Story with Yamada-kun at Lv999", yupmanga: null },
+            { title: "The 100 Girlfriends Who Really, Really, Really, Really, Really Love You", yupmanga: null },
+            { title: "Fuufu Ijou, Koibito Miman", yupmanga: null }
         ];
 
         const mangaCarousel = document.getElementById('mangaCarousel');
@@ -667,7 +667,7 @@
             card.style.transitionDelay = (index * 0.06) + 's';
             card.target = '_blank';
             card.rel = 'noopener noreferrer';
-            card.href = item.mangadex || ('https://mangadex.org/search?q=' + encodeURIComponent(item.title));
+            card.href = item.yupmanga || ('https://www.google.com/search?q=' + encodeURIComponent(item.title + ' site:yupmanga.com'));
 
             const displayTitle = (imgData && imgData.title) || item.title;
 
