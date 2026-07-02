@@ -2165,6 +2165,21 @@ strong { color: var(--text); font-weight: 600; }
   z-index: 1;
 }
 
+.trailer-badge-alt {
+  background: rgba(245,158,11,.15);
+  border: 1px solid rgba(245,158,11,.4);
+  color: #fcd34d;
+}
+
+.trailer-divider {
+  position: relative;
+  max-width: 860px;
+  height: 1px;
+  margin: 3rem auto 2.5rem;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.25), transparent);
+  z-index: 1;
+}
+
 .trailer-title {
   position: relative;
   font-family: 'Sora', sans-serif;
