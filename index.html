@@ -464,6 +464,22 @@
             }
         }
 
+        // Carga las carátulas EN LOTES pequeños y con una pausa entre cada
+        // uno, para no saturar el límite de peticiones de la API de AniList
+        // (si se piden todas a la vez, muchas quedan sin respuesta).
+        async function loadImagesStaggered(list, loadFn, concurrency = 4, delayMs = 300) {
+            const results = new Array(list.length);
+            for (let i = 0; i < list.length; i += concurrency) {
+                const batch = list.slice(i, i + concurrency);
+                const batchResults = await Promise.all(batch.map(item => loadFn(item.title)));
+                batchResults.forEach((r, j) => { results[i + j] = r; });
+                if (i + concurrency < list.length) {
+                    await new Promise(resolve => setTimeout(resolve, delayMs));
+                }
+            }
+            return results;
+        }
+
         async function initAnimeCarousel() {
             const cards = ANIME_LIST.map((item, i) => {
                 const card = renderAnimeCard(item, null, i);
@@ -476,9 +492,7 @@
                 cards.forEach(card => card.classList.add('reveal-card-in'));
             });
 
-            // Cargar todas las carátulas EN PARALELO (más rápido y confiable
-            // que una por una)
-            const results = await Promise.all(ANIME_LIST.map(item => loadAnimeImage(item.title)));
+            const results = await loadImagesStaggered(ANIME_LIST, loadAnimeImage);
 
             results.forEach((imgData, i) => {
                 if (!imgData) return;
@@ -528,7 +542,14 @@
             updateCentered();
         }
 
-        initAnimeCarousel();
+        const animeStageEl = document.querySelector('#animes .anime-stage');
+        const animeObserver = new IntersectionObserver((entries, obs) => {
+            if (entries[0].isIntersecting) {
+                initAnimeCarousel();
+                obs.disconnect();
+            }
+        }, { rootMargin: '200px' });
+        animeObserver.observe(animeStageEl);
 
         const animeArrowLeft = document.getElementById('animeArrowLeft');
         const animeArrowRight = document.getElementById('animeArrowRight');
@@ -717,7 +738,7 @@
                 cards.forEach(card => card.classList.add('reveal-card-in'));
             });
 
-            const results = await Promise.all(MANGA_LIST.map(item => loadMangaImage(item.title)));
+            const results = await loadImagesStaggered(MANGA_LIST, loadMangaImage);
 
             results.forEach((imgData, i) => {
                 if (!imgData) return;
@@ -765,7 +786,14 @@
             updateCentered();
         }
 
-        initMangaCarousel();
+        const mangaStageEl = document.querySelector('#mangas .manga-stage');
+        const mangaObserver = new IntersectionObserver((entries, obs) => {
+            if (entries[0].isIntersecting) {
+                initMangaCarousel();
+                obs.disconnect();
+            }
+        }, { rootMargin: '200px' });
+        mangaObserver.observe(mangaStageEl);
 
         const mangaArrowLeft = document.getElementById('mangaArrowLeft');
         const mangaArrowRight = document.getElementById('mangaArrowRight');
